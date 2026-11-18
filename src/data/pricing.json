@@ -1,0 +1,118 @@
+
+{
+  "currency": "INR",
+  "gstPercentage": 18,
+
+  "durations": [7, 15, 30, 60, 90],
+
+  "hoursMultiplier": {
+    "8": 1,
+    "12": 1.4,
+    "24": 1.8
+  },
+
+  "cities": {
+    "Bangalore": {
+      "elderly": {
+        "day": 900,
+        "liveIn": 1600
+      },
+      "dementia": {
+        "day": 1200,
+        "liveIn": 1900
+      },
+      "baby": {
+        "day": 850,
+        "liveIn": 1500
+      },
+      "recovery": {
+        "day": 1100,
+        "liveIn": 1800
+      }
+    },
+
+    "Chennai": {
+      "elderly": {
+        "day": 850,
+        "liveIn": 1500
+      },
+      "dementia": {
+        "day": 1150,
+        "liveIn": 1800
+      },
+      "baby": {
+        "day": 800,
+        "liveIn": 1450
+      },
+      "recovery": {
+        "day": 1050,
+        "liveIn": 1700
+      }
+    },
+
+    "Mumbai": {
+      "elderly": {
+        "day": 1100,
+        "liveIn": 1900
+      },
+      "dementia": {
+        "day": 1400,
+        "liveIn": 2200
+      },
+      "baby": {
+        "day": 1000,
+        "liveIn": 1800
+      },
+      "recovery": {
+        "day": 1300,
+        "liveIn": 2100
+      }
+    },
+
+    "Delhi": {
+      "elderly": {
+        "day": 950,
+        "liveIn": 1650
+      },
+      "dementia": {
+        "day": 1250,
+        "liveIn": 1950
+      },
+      "baby": {
+        "day": 900,
+        "liveIn": 1550
+      },
+      "recovery": {
+        "day": 1150,
+        "liveIn": 1850
+      }
+    },
+
+    "Hyderabad": {
+      "elderly": {
+        "day": 850,
+        "liveIn": 1500
+      },
+      "dementia": {
+        "day": 1100,
+        "liveIn": 1800
+      },
+      "baby": {
+        "day": 800,
+        "liveIn": 1400
+      },
+      "recovery": {
+        "day": 1000,
+        "liveIn": 1700
+      }
+    }
+  },
+
+  "addons": {
+    "physiotherapy": {
+      "name": "Physiotherapy",
+      "price": 700,
+      "unit": "visit"
+    }
+  }
+}

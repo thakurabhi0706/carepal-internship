@@ -1,7 +1,8 @@
-
+import { calculateEstimate, formatCurrency } from "./utils/pricing";
 import { Heart, ShieldCheck, Clock, ArrowRight } from "lucide-react";
 
 function App() {
+  
   return (
     <div className="min-h-screen bg-[#F7FAF9]">
       {/* Navbar */}
