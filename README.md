@@ -16,6 +16,10 @@ Families often need to contact healthcare providers just to understand the appro
 
 The application also includes an admin dashboard where authorized administrators can manage customer enquiries.
 
+<img width="2838" height="1434" alt="image" src="https://github.com/user-attachments/assets/bae80fe9-2a63-4c6d-b72d-8dc2a8768c74" />
+<img width="2866" height="1446" alt="image" src="https://github.com/user-attachments/assets/368f08c0-647d-429a-98cc-6b5369ab515e" />
+<img width="2846" height="1442" alt="image" src="https://github.com/user-attachments/assets/80740efd-2722-48be-be5b-d5573db54c1a" />
+
 ## Features
 
 ### 1. Interactive Care Plan Builder
