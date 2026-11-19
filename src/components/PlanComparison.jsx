@@ -1,26 +1,28 @@
 
 import { formatCurrency, getPricingConfig } from "../utils/pricing";
 import { ArrowLeftRight, X, TrendingDown } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 const config = getPricingConfig();
 
 const careTypes = [
-  { id: "elderly", label: "Elderly Care" },
-  { id: "dementia", label: "Alzheimer's / Dementia" },
-  { id: "baby", label: "Baby Care" },
-  { id: "recovery", label: "Post-Surgery Recovery" }
+  { id: "elderly", label: "common.elderlyCare" },
+  { id: "dementia", label: "common.dementiaCare" },
+  { id: "baby", label: "common.babyCare" },
+  { id: "recovery", label: "common.recoveryCare" }
 ];
 
 function PlanCard({ title, plan, estimate, highlighted }) {
+  const { t } = useLanguage();
   const breakdown = estimate.breakdown;
 
   const rows = [
-    ["Care Type", careTypes.find(c => c.id === plan.careType)?.label],
-    ["City", plan.city],
-    ["Daily Hours", `${plan.hoursPerDay} hours`],
-    ["Shift", plan.shift === "live-in" ? "Live-in" : "Day"],
-    ["Duration", `${plan.durationDays} days`],
-    ["Physiotherapy", `${plan.addons.physiotherapy} visits`]
+    [t("common.careType"), t(careTypes.find(c => c.id === plan.careType)?.label || "common.notSelected")],
+    [t("common.city"), plan.city],
+    [t("common.dailyHours"), `${plan.hoursPerDay} ${t("common.hours")}`],
+    [t("common.shift"), t(plan.shift === "live-in" ? "common.liveInCare" : "common.dayShift")],
+    [t("common.duration"), `${plan.durationDays} ${t("common.days")}`],
+    [t("common.physiotherapy"), `${plan.addons.physiotherapy} ${t("common.visit")}`]
   ];
 
   return (
@@ -33,12 +35,12 @@ function PlanCard({ title, plan, estimate, highlighted }) {
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-base md:text-lg text-gray-800">
-          {title}
+          {t(title)}
         </h3>
 
         {highlighted && (
           <span className="text-xs font-semibold text-teal-700 bg-teal-100 px-2 py-1 rounded-full">
-            Alternative
+            {t("comparison.alternative")}
           </span>
         )}
       </div>
@@ -59,25 +61,25 @@ function PlanCard({ title, plan, estimate, highlighted }) {
 
       <div className="border-t border-gray-200 mt-4 pt-3 space-y-2.5 text-sm">
         <div className="flex justify-between gap-3">
-          <span className="text-gray-500">Care Cost</span>
+          <span className="text-gray-500">{t("comparison.careCost")}</span>
           <span>{formatCurrency(breakdown.careCost)}</span>
         </div>
 
         <div className="flex justify-between gap-3">
-          <span className="text-gray-500">Add-ons</span>
+          <span className="text-gray-500">{t("comparison.addons")}</span>
           <span>{formatCurrency(breakdown.addonTotal)}</span>
         </div>
 
         <div className="flex justify-between gap-3">
           <span className="text-gray-500">
-            GST ({breakdown.gstPercentage}%)
+            {t("comparison.gst", { percentage: breakdown.gstPercentage })}
           </span>
           <span>{formatCurrency(breakdown.gstAmount)}</span>
         </div>
       </div>
 
       <div className="border-t border-gray-200 mt-4 pt-3">
-        <p className="text-xs text-gray-500">Total Estimate</p>
+        <p className="text-xs text-gray-500">{t("comparison.total")}</p>
         <p className="text-2xl font-bold text-teal-700 mt-1">
           {formatCurrency(breakdown.total)}
         </p>
@@ -95,6 +97,7 @@ export default function PlanComparison({
   onAddonChange,
   onClose
 }) {
+  const { t } = useLanguage();
   if (!estimate || !comparisonEstimate) return null;
 
   const plan1Total = estimate.breakdown.total;
@@ -104,9 +107,9 @@ export default function PlanComparison({
 
   const cheaperPlan =
     plan1Total < plan2Total
-      ? "Plan 1"
+      ? "comparison.original"
       : plan2Total < plan1Total
-      ? "Plan 2"
+      ? "comparison.alternativePlan"
       : null;
 
   return (
@@ -133,10 +136,10 @@ export default function PlanComparison({
                 id="comparison-title"
                 className="text-lg md:text-xl font-bold text-gray-900"
               >
-                Compare Care Plans
+                {t("comparison.title")}
               </h2>
               <p className="text-xs md:text-sm text-gray-500 mt-0.5">
-                Compare pricing and care requirements.
+                {t("comparison.subtitle")}
               </p>
             </div>
           </div>
@@ -145,7 +148,7 @@ export default function PlanComparison({
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition"
-            aria-label="Close comparison"
+            aria-label={t("comparison.close")}
           >
             <X size={22} />
           </button>
@@ -158,10 +161,10 @@ export default function PlanComparison({
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-gray-800">
-                Customize Plan 2
+                {t("comparison.customize")}
               </h3>
               <span className="text-xs text-teal-700 font-medium">
-                Editable
+                {t("comparison.editable")}
               </span>
             </div>
 
@@ -169,7 +172,7 @@ export default function PlanComparison({
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Care Type
+                  {t("common.careType")}
                 </label>
                 <select
                   value={comparisonPlan.careType}
@@ -178,7 +181,7 @@ export default function PlanComparison({
                 >
                   {careTypes.map(item => (
                     <option key={item.id} value={item.id}>
-                      {item.label}
+                      {t(item.label)}
                     </option>
                   ))}
                 </select>
@@ -186,7 +189,7 @@ export default function PlanComparison({
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  City
+                  {t("common.city")}
                 </label>
                 <select
                   value={comparisonPlan.city}
@@ -203,7 +206,7 @@ export default function PlanComparison({
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Hours per Day
+                  {t("comparison.hoursPerDay")}
                 </label>
                 <select
                   value={comparisonPlan.hoursPerDay}
@@ -214,7 +217,7 @@ export default function PlanComparison({
                 >
                   {[8, 12, 24].map(hours => (
                     <option key={hours} value={hours}>
-                      {hours} hours
+                      {hours} {t("common.hours")}
                     </option>
                   ))}
                 </select>
@@ -222,21 +225,21 @@ export default function PlanComparison({
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Care Shift
+                  {t("comparison.careShift")}
                 </label>
                 <select
                   value={comparisonPlan.shift}
                   onChange={e => onPlanChange("shift", e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:ring-2 focus:ring-teal-500 outline-none"
                 >
-                  <option value="day">Day Shift</option>
-                  <option value="live-in">Live-in Care</option>
+                  <option value="day">{t("common.dayShift")}</option>
+                  <option value="live-in">{t("common.liveInCare")}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Duration
+                  {t("common.duration")}
                 </label>
                 <select
                   value={comparisonPlan.durationDays}
@@ -247,7 +250,7 @@ export default function PlanComparison({
                 >
                   {config.durations.map(days => (
                     <option key={days} value={days}>
-                      {days} days
+                      {days} {t("common.days")}
                     </option>
                   ))}
                 </select>
@@ -255,7 +258,7 @@ export default function PlanComparison({
 
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  Physiotherapy Visits
+                  {t("comparison.physiotherapyVisits")}
                 </label>
                 <input
                   type="number"
@@ -279,18 +282,18 @@ export default function PlanComparison({
           {/* Comparison Cards */}
           <div>
             <h3 className="text-sm font-bold text-gray-700 mb-3">
-              Plan Comparison
+              {t("comparison.comparison")}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <PlanCard
-                title="Plan 1 – Original"
+                title="comparison.original"
                 plan={plan}
                 estimate={estimate}
               />
 
               <PlanCard
-                title="Plan 2 – Alternative"
+                title="comparison.alternativePlan"
                 plan={comparisonPlan}
                 estimate={comparisonEstimate}
                 highlighted
@@ -302,22 +305,24 @@ export default function PlanComparison({
           <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 md:p-5">
             <div className="flex items-center gap-2 text-teal-800 font-semibold">
               <TrendingDown size={19} />
-              Price Comparison
+              {t("comparison.priceComparison")}
             </div>
 
             {cheaperPlan ? (
               <p className="text-sm text-teal-700 mt-2">
-                <strong>{cheaperPlan}</strong> is cheaper by{" "}
-                <strong>{formatCurrency(difference)}</strong>.
+                {t("comparison.cheaper", {
+                  plan: t(cheaperPlan),
+                  amount: formatCurrency(difference)
+                })}
               </p>
             ) : (
               <p className="text-sm text-teal-700 mt-2">
-                Both plans have the same estimated price.
+                {t("comparison.samePrice")}
               </p>
             )}
 
             <p className="text-xs text-teal-600 mt-2">
-              Final pricing is subject to confirmation.
+              {t("comparison.finalPricing")}
             </p>
           </div>
         </div>
@@ -329,7 +334,7 @@ export default function PlanComparison({
             onClick={onClose}
             className="px-6 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold transition"
           >
-            Done
+            {t("common.done")}
           </button>
         </div>
       </div>

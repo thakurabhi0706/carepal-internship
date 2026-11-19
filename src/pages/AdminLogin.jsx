@@ -23,8 +23,11 @@ import {
   Navigate,
   useNavigate
 } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
+import LanguageToggle from "../components/LanguageToggle";
 
 export default function AdminLogin() {
+  const { t } = useLanguage();
   const { user, loading, isAdmin } = useAuth();
 
   const navigate = useNavigate();
@@ -55,9 +58,7 @@ export default function AdminLogin() {
       if (credential.user.uid !== import.meta.env.VITE_ADMIN_UID) {
         await signOut(auth);
 
-        setError(
-          "Access denied. You are not an authorized administrator."
-        );
+        setError("login.denied");
 
         return;
       }
@@ -71,8 +72,8 @@ export default function AdminLogin() {
 
       setError(
         err.code === "auth/invalid-credential"
-          ? "Invalid email or password."
-          : "Unable to sign in. Please try again."
+          ? "login.invalid"
+          : "login.failed"
       );
 
     } finally {
@@ -83,7 +84,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-[#F7FAF9] flex items-center justify-center p-5">
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative">
 
         <Link
           to="/"
@@ -107,11 +108,11 @@ export default function AdminLogin() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-900">
-              Admin Login
+              {t("login.title")}
             </h1>
 
             <p className="text-gray-500 mt-2 text-sm">
-              Sign in to manage TheCarePal enquiries.
+              {t("login.subtitle")}
             </p>
 
           </div>
@@ -120,7 +121,7 @@ export default function AdminLogin() {
 
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Email Address
+                {t("login.email")}
               </label>
 
               <div className="relative">
@@ -142,7 +143,7 @@ export default function AdminLogin() {
 
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Password
+                {t("login.password")}
               </label>
 
               <div className="relative">
@@ -156,7 +157,7 @@ export default function AdminLogin() {
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t("login.passwordPlaceholder")}
                   className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
@@ -164,7 +165,7 @@ export default function AdminLogin() {
 
             {error && (
               <div className="bg-red-50 border border-red-100 text-red-600 rounded-lg p-3 text-sm">
-                {error}
+                {t(error)}
               </div>
             )}
 
@@ -173,7 +174,7 @@ export default function AdminLogin() {
               disabled={submitting || loading}
               className="w-full bg-teal-600 text-white rounded-xl py-3.5 font-semibold flex items-center justify-center gap-2 hover:bg-teal-700 disabled:opacity-50"
             >
-              {submitting ? "Signing in..." : "Sign In"}
+              {submitting ? t("login.signingIn") : t("login.signIn")}
 
               {!submitting && <ArrowRight size={18} />}
             </button>
@@ -182,7 +183,7 @@ export default function AdminLogin() {
 
           <p className="text-center text-xs text-gray-400 mt-7">
             <ShieldCheck size={14} className="inline mr-1" />
-            Authorized administrators only
+            {t("login.authorized")}
           </p>
 
         </div>
@@ -191,9 +192,12 @@ export default function AdminLogin() {
           to="/"
           className="block text-center text-sm text-gray-500 mt-6 hover:text-teal-700"
         >
-          Back to TheCarePal
+          {t("login.back")}
         </Link>
 
+      </div>
+      <div className="absolute top-5 right-5">
+        <LanguageToggle />
       </div>
     </div>
   );

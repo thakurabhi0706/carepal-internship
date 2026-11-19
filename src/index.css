@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Inter, "Noto Sans Devanagari", "Nirmala UI", system-ui, sans-serif;
   color: #172b35;
   background: #f8fafb;
   font-synthesis: none;

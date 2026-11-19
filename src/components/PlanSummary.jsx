@@ -1,45 +1,46 @@
 
 import { MapPin, Clock, CalendarDays, Heart } from "lucide-react";
-
-const careLabels = {
-  elderly: "Elderly Care",
-  dementia: "Alzheimer's / Dementia Care",
-  baby: "Baby Care",
-  recovery: "Post-Surgery Recovery"
-};
+import { useLanguage } from "../context/LanguageContext";
 
 export default function PlanSummary({ plan }) {
+  const { t } = useLanguage();
+  const careLabels = {
+    elderly: t("common.elderlyCare"),
+    dementia: t("common.dementiaCare"),
+    baby: t("common.babyCare"),
+    recovery: t("common.recoveryCare")
+  };
   const items = [
     {
       icon: Heart,
-      label: "Care Type",
-      value: careLabels[plan.careType] || "Not selected"
+      label: t("common.careType"),
+      value: careLabels[plan.careType] || t("common.notSelected")
     },
     {
       icon: MapPin,
-      label: "City",
-      value: plan.city || "Not selected"
+      label: t("common.city"),
+      value: plan.city || t("common.notSelected")
     },
     {
       icon: Clock,
-      label: "Daily Hours",
+      label: t("common.dailyHours"),
       value: plan.hoursPerDay
-        ? `${plan.hoursPerDay} hours`
-        : "Not selected"
+        ? `${plan.hoursPerDay} ${t("common.hours")}`
+        : t("common.notSelected")
     },
     {
       icon: CalendarDays,
-      label: "Duration",
+      label: t("common.duration"),
       value: plan.durationDays
-        ? `${plan.durationDays} days`
-        : "Not selected"
+        ? `${plan.durationDays} ${t("common.days")}`
+        : t("common.notSelected")
     }
   ];
 
   return (
     <div className="bg-white border border-gray-100 rounded-2xl p-5">
       <h3 className="font-bold text-gray-800 mb-5">
-        Your Care Plan
+        {t("summary.title")}
       </h3>
 
       <div className="space-y-5">

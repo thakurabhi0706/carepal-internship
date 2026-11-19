@@ -12,6 +12,8 @@ import {
 
 import { db } from "../lib/firebase";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import LanguageToggle from "../components/LanguageToggle";
 
 import {
   Heart,
@@ -76,6 +78,33 @@ function StatCard({ title, value, icon: Icon, color }) {
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
+
+  const statusLabel = status => ({
+    new: t("admin.statusNew"),
+    contacted: t("admin.statusContacted"),
+    converted: t("admin.statusConverted"),
+    rejected: t("admin.statusRejected")
+  }[status] || status);
+
+  const careTypeLabel = careType => ({
+    elderly: t("common.elderlyCare"),
+    dementia: t("common.dementiaCare"),
+    baby: t("common.babyCare"),
+    recovery: t("common.recoveryCare")
+  }[careType] || careType || "-");
+
+  const callbackLabel = value => ({
+    Anytime: t("common.anytime"),
+    Morning: t("common.morning"),
+    Afternoon: t("common.afternoon"),
+    Evening: t("common.evening")
+  }[value] || value);
+
+  const shiftLabel = value => ({
+    day: t("common.dayShift"),
+    "live-in": t("common.liveInCare")
+  }[value] || value || "-");
 
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +138,7 @@ export default function AdminDashboard() {
         console.error("Firestore error:", err);
 
         setError(
-          "Unable to load enquiries. Check your Firestore permissions."
+          "admin.loadError"
         );
 
         setLoading(false);
@@ -142,7 +171,7 @@ export default function AdminDashboard() {
   // Export filtered enquiries as CSV
   const exportCSV = () => {
     if (filteredLeads.length === 0) {
-      alert("No enquiries available to export.");
+      alert(t("admin.noExport"));
       return;
     }
 
@@ -241,7 +270,7 @@ export default function AdminDashboard() {
 
     } catch (err) {
       console.error("Status update error:", err);
-      alert("Unable to update enquiry status.");
+      alert(t("admin.updateError"));
 
     } finally {
       setUpdating(false);
@@ -250,7 +279,7 @@ export default function AdminDashboard() {
 
   // Format Firestore timestamp
   const formatDate = (timestamp) => {
-    if (!timestamp?.toDate) return "Pending";
+    if (!timestamp?.toDate) return t("common.pending");
 
     return timestamp.toDate().toLocaleString("en-IN", {
       dateStyle: "medium",
@@ -285,23 +314,23 @@ export default function AdminDashboard() {
 
         <div className="p-5">
           <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider mb-4">
-            Management
+            {t("admin.management")}
           </p>
 
           <div className="flex items-center gap-3 bg-teal-50 text-teal-700 rounded-xl p-3 font-semibold">
             <LayoutDashboard size={19} />
-            Dashboard
+            {t("admin.dashboard")}
           </div>
 
           <div className="flex items-center gap-3 text-gray-500 rounded-xl p-3 mt-2">
             <Users size={19} />
-            Customer Enquiries
+            {t("admin.enquiries")}
           </div>
         </div>
 
         <div className="mt-auto p-5 border-t border-gray-100">
           <p className="text-xs text-gray-400 mb-2">
-            Logged in as
+            {t("admin.loggedIn")}
           </p>
 
           <p className="text-sm font-semibold truncate">
@@ -313,7 +342,7 @@ export default function AdminDashboard() {
             className="flex items-center gap-2 text-red-500 mt-5 text-sm font-semibold hover:text-red-700"
           >
             <LogOut size={18} />
-            Logout
+            {t("admin.logout")}
           </button>
         </div>
 
@@ -339,35 +368,38 @@ export default function AdminDashboard() {
             </div>
 
             <p className="text-xs sm:text-sm text-gray-500">
-              TheCarePal / Admin
+              {t("admin.breadcrumb")}
             </p>
 
             <h1 className="text-2xl sm:text-3xl font-bold mt-1">
-              Dashboard
+              {t("admin.dashboard")}
             </h1>
 
             <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Manage customer enquiries and care plans.
+              {t("admin.dashboardSubtitle")}
             </p>
 
           </div>
 
-          {/* Mobile Logout */}
-          <button
-            onClick={handleLogout}
-            className="md:hidden shrink-0 p-2.5 bg-white rounded-xl border border-gray-200 text-red-500"
-            aria-label="Logout"
-          >
-            <LogOut size={19} />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <LanguageToggle />
 
-          {/* Desktop Active Status */}
-          <div className="hidden md:flex items-center gap-2 bg-white border rounded-xl px-4 py-3">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
+            {/* Mobile Logout */}
+            <button
+              onClick={handleLogout}
+              className="md:hidden shrink-0 p-2.5 bg-white rounded-xl border border-gray-200 text-red-500"
+              aria-label={t("admin.logout")}
+            >
+              <LogOut size={19} />
+            </button>
 
-            <span className="text-sm text-gray-600">
-              Admin Active
-            </span>
+            {/* Desktop Active Status */}
+            <div className="hidden md:flex items-center gap-2 bg-white border rounded-xl px-4 py-3">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="text-sm text-gray-600">
+                {t("admin.active")}
+              </span>
+            </div>
           </div>
 
         </header>
@@ -376,28 +408,28 @@ export default function AdminDashboard() {
         <section className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-6 md:mb-8">
 
           <StatCard
-            title="Total Enquiries"
+            title={t("admin.total")}
             value={stats.total}
             icon={Users}
             color="bg-blue-50 text-blue-600"
           />
 
           <StatCard
-            title="New Enquiries"
+            title={t("admin.new")}
             value={stats.new}
             icon={Clock}
             color="bg-amber-50 text-amber-600"
           />
 
           <StatCard
-            title="Contacted"
+            title={t("admin.contacted")}
             value={stats.contacted}
             icon={RefreshCw}
             color="bg-purple-50 text-purple-600"
           />
 
           <StatCard
-            title="Converted"
+            title={t("admin.converted")}
             value={stats.converted}
             icon={CheckCircle}
             color="bg-green-50 text-green-600"
@@ -423,7 +455,7 @@ export default function AdminDashboard() {
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Search name, phone or city"
+                  placeholder={t("admin.search")}
                   className="border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm w-full sm:w-72 outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
@@ -434,7 +466,7 @@ export default function AdminDashboard() {
                 className="flex items-center justify-center gap-2 bg-teal-600 text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition w-full sm:w-auto"
               >
                 <Download size={18} />
-                Export CSV
+                {t("admin.export")}
               </button>
 
             </div>
@@ -452,7 +484,7 @@ export default function AdminDashboard() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  {status === "all" ? "All Leads" : status}
+                  {status === "all" ? t("admin.statusAll") : statusLabel(status)}
                 </button>
               ))}
 
@@ -472,7 +504,7 @@ export default function AdminDashboard() {
 
             <div className="p-16 text-center text-gray-500">
               <RefreshCw className="animate-spin mx-auto mb-3" />
-              Loading enquiries...
+              {t("admin.loading")}
             </div>
 
           ) : filteredLeads.length === 0 ? (
@@ -481,11 +513,11 @@ export default function AdminDashboard() {
               <Users className="mx-auto text-gray-300 mb-3" size={40} />
 
               <p className="font-semibold text-gray-700">
-                No enquiries found
+                {t("admin.noResults")}
               </p>
 
               <p className="text-sm text-gray-400 mt-2">
-                Try changing your search or filters.
+                {t("admin.emptyHint")}
               </p>
             </div>
 
@@ -508,7 +540,7 @@ export default function AdminDashboard() {
 
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 truncate">
-                          {lead.customer?.name || "Unknown"}
+                          {lead.customer?.name || t("common.unknown")}
                         </p>
 
                         <p className="text-xs text-gray-500 mt-1">
@@ -522,7 +554,7 @@ export default function AdminDashboard() {
                           "bg-gray-100 text-gray-600"
                         }`}
                       >
-                        {lead.status}
+                        {statusLabel(lead.status)}
                       </span>
 
                     </div>
@@ -531,17 +563,17 @@ export default function AdminDashboard() {
 
                       <div>
                         <p className="text-xs text-gray-400">
-                          Care Type
+                          {t("common.careType")}
                         </p>
 
                         <p className="font-medium capitalize">
-                          {lead.carePlan?.careType || "-"}
+                          {careTypeLabel(lead.carePlan?.careType)}
                         </p>
                       </div>
 
                       <div>
                         <p className="text-xs text-gray-400">
-                          City
+                          {t("common.city")}
                         </p>
 
                         <p className="font-medium">
@@ -551,7 +583,7 @@ export default function AdminDashboard() {
 
                       <div>
                         <p className="text-xs text-gray-400">
-                          Estimate
+                          {t("admin.estimate")}
                         </p>
 
                         <p className="font-semibold text-teal-700">
@@ -565,7 +597,7 @@ export default function AdminDashboard() {
                       onClick={() => setSelectedLead(lead)}
                       className="w-full border border-teal-600 text-teal-700 rounded-lg py-2.5 text-sm font-semibold hover:bg-teal-50 transition"
                     >
-                      View Details
+                      {t("admin.viewDetails")}
                     </button>
 
                   </div>
@@ -583,12 +615,12 @@ export default function AdminDashboard() {
 
                   <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                     <tr>
-                      <th className="px-6 py-4">Customer</th>
-                      <th className="px-6 py-4">Care Type</th>
-                      <th className="px-6 py-4">City</th>
-                      <th className="px-6 py-4">Estimate</th>
-                      <th className="px-6 py-4">Status</th>
-                      <th className="px-6 py-4">Action</th>
+                      <th className="px-6 py-4">{t("admin.customer")}</th>
+                      <th className="px-6 py-4">{t("common.careType")}</th>
+                      <th className="px-6 py-4">{t("common.city")}</th>
+                      <th className="px-6 py-4">{t("admin.estimate")}</th>
+                      <th className="px-6 py-4">{t("admin.status")}</th>
+                      <th className="px-6 py-4">{t("admin.action")}</th>
                     </tr>
                   </thead>
 
@@ -603,7 +635,7 @@ export default function AdminDashboard() {
 
                         <td className="px-6 py-4">
                           <p className="font-semibold text-gray-900">
-                            {lead.customer?.name || "Unknown"}
+                            {lead.customer?.name || t("common.unknown")}
                           </p>
 
                           <p className="text-xs text-gray-400 mt-1">
@@ -612,7 +644,7 @@ export default function AdminDashboard() {
                         </td>
 
                         <td className="px-6 py-4 capitalize text-sm">
-                          {lead.carePlan?.careType || "-"}
+                          {careTypeLabel(lead.carePlan?.careType)}
                         </td>
 
                         <td className="px-6 py-4 text-sm">
@@ -630,7 +662,7 @@ export default function AdminDashboard() {
                               "bg-gray-100 text-gray-600"
                             }`}
                           >
-                            {lead.status}
+                            {statusLabel(lead.status)}
                           </span>
                         </td>
 
@@ -639,7 +671,7 @@ export default function AdminDashboard() {
                             onClick={() => setSelectedLead(lead)}
                             className="text-teal-700 font-semibold text-sm hover:underline"
                           >
-                            View Details
+                            {t("admin.viewDetails")}
                           </button>
                         </td>
 
@@ -659,7 +691,7 @@ export default function AdminDashboard() {
         </section>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          TheCarePal Admin Management System
+          {t("admin.system")}
         </p>
 
       </main>
@@ -685,18 +717,18 @@ export default function AdminDashboard() {
 
               <div className="min-w-0">
                 <h2 className="text-lg sm:text-xl font-bold">
-                  Enquiry Details
+                  {t("admin.detailsTitle")}
                 </h2>
 
                 <p className="text-xs text-gray-400 mt-1 break-all">
-                  ID: {selectedLead.id}
+                  {t("admin.recordId")}: {selectedLead.id}
                 </p>
               </div>
 
               <button
                 onClick={() => setSelectedLead(null)}
                 className="p-2 rounded-lg hover:bg-gray-100 shrink-0"
-                aria-label="Close details"
+                aria-label={t("admin.closeDetails")}
               >
                 <X size={21} />
               </button>
@@ -708,7 +740,7 @@ export default function AdminDashboard() {
               {/* Customer Information */}
               <div>
                 <h3 className="font-bold mb-4">
-                  Customer Information
+                  {t("admin.customerInfo")}
                 </h3>
 
                 <div className="space-y-3 text-sm">
@@ -735,7 +767,7 @@ export default function AdminDashboard() {
                   <p className="flex gap-3 items-center">
                     <Clock size={17} className="text-teal-600 shrink-0" />
                     <span>
-                      Callback: {selectedLead.customer?.callbackTime}
+                      {t("admin.callback")}: {callbackLabel(selectedLead.customer?.callbackTime)}
                     </span>
                   </p>
 
@@ -746,21 +778,21 @@ export default function AdminDashboard() {
               <div className="border-t pt-6">
 
                 <h3 className="font-bold mb-4">
-                  Care Plan Information
+                  {t("admin.carePlanInfo")}
                 </h3>
 
                 <div className="grid grid-cols-2 gap-4 sm:gap-5 text-sm">
 
                   <div>
-                    <p className="text-gray-400">Care Type</p>
+                    <p className="text-gray-400">{t("common.careType")}</p>
 
                     <p className="font-semibold capitalize">
-                      {selectedLead.carePlan?.careType}
+                      {careTypeLabel(selectedLead.carePlan?.careType)}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-gray-400">City</p>
+                    <p className="text-gray-400">{t("common.city")}</p>
 
                     <p className="font-semibold flex items-center gap-1">
                       <MapPin size={14} />
@@ -769,26 +801,26 @@ export default function AdminDashboard() {
                   </div>
 
                   <div>
-                    <p className="text-gray-400">Daily Hours</p>
+                    <p className="text-gray-400">{t("common.dailyHours")}</p>
 
                     <p className="font-semibold">
-                      {selectedLead.carePlan?.hoursPerDay} hours
+                      {selectedLead.carePlan?.hoursPerDay} {t("common.hours")}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-gray-400">Shift</p>
+                    <p className="text-gray-400">{t("common.shift")}</p>
 
                     <p className="font-semibold capitalize">
-                      {selectedLead.carePlan?.shift}
+                      {shiftLabel(selectedLead.carePlan?.shift)}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-gray-400">Duration</p>
+                    <p className="text-gray-400">{t("common.duration")}</p>
 
                     <p className="font-semibold">
-                      {selectedLead.carePlan?.durationDays} days
+                      {selectedLead.carePlan?.durationDays} {t("common.days")}
                     </p>
                   </div>
 
@@ -798,7 +830,7 @@ export default function AdminDashboard() {
                 <div className="mt-5">
 
                   <p className="text-gray-400 text-sm mb-2">
-                    Additional Services
+                    {t("admin.additionalServices")}
                   </p>
 
                   <div className="flex flex-wrap gap-2">
@@ -813,7 +845,7 @@ export default function AdminDashboard() {
                           key={name}
                           className="bg-teal-50 text-teal-700 px-3 py-2 rounded-lg text-xs font-semibold capitalize"
                         >
-                          {name}: {quantity}
+                          {name === "physiotherapy" ? t("common.physiotherapy") : name}: {quantity}
                         </span>
 
                       ))}
@@ -823,7 +855,7 @@ export default function AdminDashboard() {
                     ).every(q => Number(q) === 0) && (
 
                       <span className="text-sm text-gray-400">
-                        No additional services
+                        {t("admin.noServices")}
                       </span>
 
                     )}
@@ -838,7 +870,7 @@ export default function AdminDashboard() {
               <div className="border-t pt-6">
 
                 <h3 className="font-bold mb-4">
-                  Pricing Breakdown
+                  {t("admin.pricingBreakdown")}
                 </h3>
 
                 {selectedLead.pricing ? (
@@ -847,14 +879,14 @@ export default function AdminDashboard() {
 
                     {/* Base Care Calculation */}
                     <p className="font-semibold text-gray-800 mb-3">
-                      Care Charges
+                      {t("admin.careCharges")}
                     </p>
 
                     <div className="space-y-3 text-sm">
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-500">
-                          Base daily rate
+                          {t("admin.baseDaily")}
                         </span>
 
                         <span className="font-medium text-gray-800 text-right">
@@ -864,7 +896,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-500">
-                          Hours multiplier
+                          {t("admin.hoursMultiplier")}
                         </span>
 
                         <span className="font-medium text-gray-800">
@@ -874,7 +906,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-500">
-                          Daily care cost
+                          {t("admin.dailyCost")}
                         </span>
 
                         <span className="font-medium text-gray-800 text-right">
@@ -884,7 +916,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-500">
-                          Duration ({selectedLead.carePlan?.durationDays} days)
+                          {t("admin.durationDays", { days: selectedLead.carePlan?.durationDays })}
                         </span>
 
                         <span className="font-semibold text-gray-800 text-right">
@@ -898,7 +930,7 @@ export default function AdminDashboard() {
                     <div className="border-t border-gray-100 mt-5 pt-4">
 
                       <p className="font-semibold text-gray-800 mb-3">
-                        Additional Services
+                        {t("admin.additionalServices")}
                       </p>
 
                       {selectedLead.pricing.addons?.length > 0 ? (
@@ -914,12 +946,12 @@ export default function AdminDashboard() {
 
                               <div className="min-w-0">
                                 <p className="font-medium text-gray-700">
-                                  {addon.name}
+                                  {addon.key === "physiotherapy" ? t("common.physiotherapy") : addon.name}
                                 </p>
 
                                 <p className="text-xs text-gray-400 mt-1">
-                                  {addon.quantity} {addon.unit}
-                                  {addon.quantity > 1 ? "s" : ""} × {money(addon.unitPrice)}
+                                  {addon.quantity} {addon.key === "physiotherapy" ? t("common.visit") : addon.unit}
+                                  {addon.quantity > 1 && addon.key !== "physiotherapy" ? "s" : ""} × {money(addon.unitPrice)}
                                 </p>
                               </div>
 
@@ -936,7 +968,7 @@ export default function AdminDashboard() {
                       ) : (
 
                         <p className="text-sm text-gray-400">
-                          No additional service charges.
+                          {t("admin.noServiceCharges")}
                         </p>
 
                       )}
@@ -948,7 +980,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-600">
-                          Care charges
+                          {t("admin.careCharges")}
                         </span>
 
                         <span className="text-right">
@@ -958,7 +990,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-600">
-                          Additional services
+                          {t("admin.addOnTotal")}
                         </span>
 
                         <span className="text-right">
@@ -967,7 +999,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex justify-between gap-3 font-semibold">
-                        <span>Subtotal</span>
+                        <span>{t("estimate.subtotal")}</span>
 
                         <span className="text-right">
                           {money(selectedLead.pricing.subtotal)}
@@ -976,7 +1008,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between gap-3">
                         <span className="text-gray-600">
-                          GST ({selectedLead.pricing.gstPercentage}%)
+                          {t("estimate.gst", { percentage: selectedLead.pricing.gstPercentage })}
                         </span>
 
                         <span className="text-right">
@@ -991,11 +1023,11 @@ export default function AdminDashboard() {
 
                       <div>
                         <p className="font-bold text-teal-900">
-                          Final Estimate
+                          {t("admin.finalEstimate")}
                         </p>
 
                         <p className="text-xs text-teal-700 mt-1">
-                          Inclusive of GST
+                          {t("admin.inclusiveGst")}
                         </p>
                       </div>
 
@@ -1011,7 +1043,7 @@ export default function AdminDashboard() {
 
                   <div className="bg-gray-50 rounded-xl p-5">
                     <p className="text-sm text-gray-500">
-                      Detailed pricing information is unavailable for this enquiry.
+                      {t("admin.pricingUnavailable")}
                     </p>
                   </div>
 
@@ -1023,7 +1055,7 @@ export default function AdminDashboard() {
               <div className="border-t pt-6">
 
                 <h3 className="font-bold mb-3">
-                  Update Enquiry Status
+                  {t("admin.updateStatus")}
                 </h3>
 
                 <select
@@ -1038,7 +1070,7 @@ export default function AdminDashboard() {
                   {statuses.map(status => (
 
                     <option key={status} value={status}>
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                      {statusLabel(status)}
                     </option>
 
                   ))}
@@ -1047,7 +1079,7 @@ export default function AdminDashboard() {
 
                 {updating && (
                   <p className="text-xs text-gray-400 mt-2">
-                    Updating status...
+                    {t("admin.updating")}
                   </p>
                 )}
 
@@ -1056,7 +1088,7 @@ export default function AdminDashboard() {
               {/* Submission Date */}
               <div className="text-xs text-gray-400 flex gap-2 items-center">
                 <CalendarDays size={15} />
-                Submitted: {formatDate(selectedLead.createdAt)}
+                {t("admin.submitted")}: {formatDate(selectedLead.createdAt)}
               </div>
 
             </div>

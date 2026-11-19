@@ -1,15 +1,18 @@
 
+import { useLanguage } from "../context/LanguageContext";
+
 export default function ProgressBar({ currentStep, totalSteps }) {
+  const { t } = useLanguage();
   const progress = (currentStep / totalSteps) * 100;
 
   return (
     <div className="w-full mb-8">
       <div className="flex justify-between text-sm mb-2">
         <span className="font-semibold text-gray-700">
-          Step {currentStep} of {totalSteps}
+          {t("calculator.step", { current: currentStep, total: totalSteps })}
         </span>
         <span className="text-teal-600 font-medium">
-          {Math.round(progress)}% completed
+          {t("calculator.completed", { progress: Math.round(progress) })}
         </span>
       </div>
 

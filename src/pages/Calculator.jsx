@@ -11,6 +11,8 @@ import {
 
 import ProgressBar from "../components/ProgressBar";
 import PlanSummary from "../components/PlanSummary";
+import LanguageToggle from "../components/LanguageToggle";
+import { useLanguage } from "../context/LanguageContext";
 
 import {
   calculateEstimate,
@@ -23,26 +25,26 @@ const config = getPricingConfig();
 const careTypes = [
   {
     id: "elderly",
-    title: "Elderly Care",
-    description: "Daily assistance and companionship",
+    title: "common.elderlyCare",
+    description: "calculator.elderlyDescription",
     icon: UserRound
   },
   {
     id: "dementia",
-    title: "Alzheimer's / Dementia",
-    description: "Specialized memory care support",
+    title: "common.dementiaCare",
+    description: "calculator.dementiaDescription",
     icon: Heart
   },
   {
     id: "baby",
-    title: "Baby Care",
-    description: "Care and assistance for babies",
+    title: "common.babyCare",
+    description: "calculator.babyDescription",
     icon: Baby
   },
   {
     id: "recovery",
-    title: "Post-Surgery Recovery",
-    description: "Support during recovery at home",
+    title: "common.recoveryCare",
+    description: "calculator.recoveryDescription",
     icon: Activity
   }
 ];
@@ -59,6 +61,7 @@ const initialPlan = {
 };
 
 export default function Calculator() {
+    const { t } = useLanguage();
     const [comparisonPlan, setComparisonPlan] = useState(null);
     const [showComparison, setShowComparison] = useState(false);
   const [step, setStep] = useState(1);
@@ -161,28 +164,27 @@ export default function Calculator() {
     if (!estimate) return;
 
     const careTypeName =
-      careTypes.find(item => item.id === plan.careType)?.title ||
-      plan.careType;
+      t(careTypes.find(item => item.id === plan.careType)?.title || plan.careType);
 
     const shiftName =
-      plan.shift === "live-in" ? "Live-in Care" : "Day Shift";
+      t(plan.shift === "live-in" ? "common.liveInCare" : "common.dayShift");
 
     const message = [
-      "Hello! I have generated a care plan estimate using TheCarePal.",
+      t("calculator.whatsappIntro"),
       "",
-      "*My Care Plan Details*",
-      `Care Type: ${careTypeName}`,
-      `City: ${plan.city}`,
-      `Daily Care: ${plan.hoursPerDay} hours`,
-      `Shift: ${shiftName}`,
-      `Duration: ${plan.durationDays} days`,
-      `Physiotherapy Visits: ${plan.addons.physiotherapy}`,
+      `*${t("calculator.planDetails")}*`,
+      `${t("calculator.careLabel")}: ${careTypeName}`,
+      `${t("calculator.cityLabel")}: ${plan.city}`,
+      `${t("calculator.dailyCare")}: ${plan.hoursPerDay} ${t("common.hours")}`,
+      `${t("calculator.shiftLabel")}: ${shiftName}`,
+      `${t("calculator.durationLabel")}: ${plan.durationDays} ${t("common.days")}`,
+      `${t("calculator.physioVisits")}: ${plan.addons.physiotherapy}`,
       "",
-      `*Estimated Total: ${formatCurrency(estimate.breakdown.total)}*`,
+      `*${t("calculator.estimatedTotal")}: ${formatCurrency(estimate.breakdown.total)}*`,
       "",
-      "Please contact me for further details.",
+      t("calculator.contactFurther"),
       "",
-      "Generated using TheCarePal."
+      t("calculator.generatedBy")
     ].join("\n");
 
     const whatsappUrl =
@@ -197,22 +199,22 @@ export default function Calculator() {
     setSubmissionError("");
 
     if (!customer.name.trim()) {
-      setSubmissionError("Please enter your name.");
+      setSubmissionError("calculator.submitErrorName");
       return;
     }
 
     if (!/^[6-9]\d{9}$/.test(customer.phone)) {
-      setSubmissionError("Enter a valid 10-digit Indian mobile number.");
+      setSubmissionError("calculator.submitErrorPhone");
       return;
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) {
-      setSubmissionError("Enter a valid email address.");
+      setSubmissionError("calculator.submitErrorEmail");
       return;
     }
 
     if (!estimate) {
-      setSubmissionError("Please complete your care plan.");
+      setSubmissionError("calculator.submitErrorPlan");
       return;
     }
 
@@ -248,7 +250,7 @@ export default function Calculator() {
       console.error("Lead submission error:", error);
 
       setSubmissionError(
-        "Unable to submit your enquiry. Please try again."
+        "calculator.submitErrorFailed"
       );
 
     } finally {
@@ -314,10 +316,10 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              Who needs care?
+              {t("calculator.whoNeeds")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Select the type of care you are looking for.
+              {t("calculator.selectCare")}
             </p>
 
             <div className="grid sm:grid-cols-2 gap-4">
@@ -341,11 +343,11 @@ export default function Calculator() {
                     </div>
 
                     <h3 className="font-bold mt-4 text-gray-800">
-                      {item.title}
+                      {t(item.title)}
                     </h3>
 
                     <p className="text-sm text-gray-500 mt-1">
-                      {item.description}
+                      {t(item.description)}
                     </p>
                   </OptionCard>
                 );
@@ -358,10 +360,10 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              Where do you need care?
+              {t("calculator.whereNeeds")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Select your city to get the correct pricing.
+              {t("calculator.selectCity")}
             </p>
 
             <div className="grid grid-cols-2 gap-4">
@@ -387,10 +389,10 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              How many hours of care?
+              {t("calculator.hoursQuestion")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Choose the required care duration per day.
+              {t("calculator.hoursDescription")}
             </p>
 
             <div className="grid grid-cols-3 gap-3">
@@ -404,7 +406,7 @@ export default function Calculator() {
                     <h3 className="text-2xl font-bold text-gray-800">
                       {hours}
                     </h3>
-                    <p className="text-sm text-gray-500">Hours/day</p>
+                    <p className="text-sm text-gray-500">{t("calculator.hoursPerDay")}</p>
                   </div>
                 </OptionCard>
               ))}
@@ -416,10 +418,10 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              Choose your care shift
+              {t("calculator.shiftQuestion")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Select how the caregiver should provide care.
+              {t("calculator.shiftDescription")}
             </p>
 
             <div className="space-y-4">
@@ -428,10 +430,10 @@ export default function Calculator() {
                 onClick={() => updatePlan("shift", "day")}
               >
                 <h3 className="font-bold text-gray-800">
-                  Day Shift
+                  {t("common.dayShift")}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Caregiver visits during scheduled daytime hours.
+                  {t("calculator.dayDescription")}
                 </p>
               </OptionCard>
 
@@ -440,10 +442,10 @@ export default function Calculator() {
                 onClick={() => updatePlan("shift", "live-in")}
               >
                 <h3 className="font-bold text-gray-800">
-                  Live-in Care
+                  {t("common.liveInCare")}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Caregiver stays at the patient's home.
+                  {t("calculator.liveInDescription")}
                 </p>
               </OptionCard>
             </div>
@@ -454,10 +456,10 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              How long is care required?
+              {t("calculator.durationQuestion")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Select your preferred care duration.
+              {t("calculator.durationDescription")}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -472,7 +474,7 @@ export default function Calculator() {
                       {days}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Days
+                      {t("common.days")}
                     </p>
                   </div>
                 </OptionCard>
@@ -485,19 +487,19 @@ export default function Calculator() {
         return (
           <>
             <h2 className="text-2xl font-bold text-gray-900">
-              Add additional services
+              {t("calculator.additionalServices")}
             </h2>
             <p className="text-gray-500 mt-2 mb-6">
-              Customize your care plan with additional services.
+              {t("calculator.customizeServices")}
             </p>
 
             <div className="border border-gray-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-bold text-gray-800">
-                  Physiotherapy
+                  {t("common.physiotherapy")}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  ₹700 per visit
+                  {t("calculator.perVisit")}
                 </p>
               </div>
 
@@ -531,7 +533,7 @@ export default function Calculator() {
             {estimate && (
               <div className="mt-6 bg-teal-50 rounded-xl p-5">
                 <p className="text-sm text-teal-700">
-                  Your current estimated total
+                  {t("calculator.currentEstimate")}
                 </p>
                 <h3 className="text-3xl font-bold text-teal-800 mt-2">
                   {formatCurrency(estimate.breakdown.total)}
@@ -552,6 +554,9 @@ export default function Calculator() {
         <div className="max-w-6xl mx-auto flex items-center gap-2">
           <Heart className="text-teal-600" size={25} />
           <span className="font-bold text-xl">TheCarePal</span>
+          <div className="ml-auto">
+            <LanguageToggle />
+          </div>
         </div>
       </header>
 
@@ -561,15 +566,15 @@ export default function Calculator() {
             onClick={() => window.location.href = "/"}
             className="text-sm text-teal-700 font-semibold mb-8"
           >
-            ← Back to Home
+            ← {t("calculator.backHome")}
           </button>
 
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-            Build Your Care Plan
+            {t("calculator.title")}
           </h1>
 
           <p className="text-gray-500 mt-2 mb-9">
-            Tell us your requirements to get a personalized estimate.
+            {t("calculator.subtitle")}
           </p>
 
           <ProgressBar
@@ -604,7 +609,7 @@ export default function Calculator() {
                         className="w-full flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#1DA851] text-white font-semibold py-3.5 px-5 rounded-xl transition"
                         >
                         <MessageCircle size={21} />
-                        Share Estimate on WhatsApp
+                        {t("calculator.shareWhatsapp")}
                         </button>
 
                         <button
@@ -613,7 +618,7 @@ export default function Calculator() {
                         className="w-full flex items-center justify-center gap-2 border-2 border-teal-600 text-teal-700 hover:bg-teal-50 font-semibold py-3.5 px-5 rounded-xl transition"
                         >
                         <ArrowLeftRight size={19} />
-                        Compare with Another Plan
+                        {t("calculator.comparePlans")}
                         </button>
 
                     </div>
@@ -645,7 +650,7 @@ export default function Calculator() {
                       className="flex items-center gap-2 px-5 py-3 rounded-xl border font-semibold text-gray-600 disabled:opacity-30"
                     >
                       <ArrowLeft size={18} />
-                      Back
+                      {t("common.back")}
                     </button>
 
                     <button
@@ -653,7 +658,7 @@ export default function Calculator() {
                       disabled={!canContinue()}
                       className="flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-600 text-white font-semibold hover:bg-teal-700 disabled:opacity-40"
                     >
-                      {step === totalSteps ? "View Estimate" : "Continue"}
+                      {step === totalSteps ? t("calculator.viewEstimate") : t("common.continue")}
                       <ArrowRight size={18} />
                     </button>
 

@@ -20,20 +20,23 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { LanguageProvider, useLanguage } from "./context/LanguageContext";
+import LanguageToggle from "./components/LanguageToggle";
 
 function Home() {
+  const { t } = useLanguage();
   const services = [
-    ["Elderly Care", "Daily assistance for senior citizens."],
-    ["Dementia Care", "Specialized memory care support."],
-    ["Baby Care", "Reliable care for babies."],
-    ["Recovery Care", "Support during post-surgery recovery."]
+    ["common.elderlyCare", "home.elderlyDescription"],
+    ["common.dementiaCare", "home.dementiaDescription"],
+    ["common.babyCare", "home.babyDescription"],
+    ["common.recoveryCare", "home.recoveryDescription"]
   ];
 
   return (
     <div className="min-h-screen bg-[#F7FAF9]">
 
       {/* Navigation */}
-      <nav className="flex justify-between items-center px-5 sm:px-6 md:px-16 py-5 bg-white border-b">
+      <nav className="flex flex-wrap justify-between items-center gap-y-3 px-3 sm:px-6 md:px-16 py-5 bg-white border-b">
 
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
@@ -44,21 +47,23 @@ function Home() {
         </div>
 
         {/* Navigation Links */}
-        <div className="flex items-center gap-3 sm:gap-6">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-6">
 
           <a
             href="#services"
             className="text-xs sm:text-sm font-semibold text-gray-700 hover:text-teal-600 transition whitespace-nowrap"
           >
-            Our Services
+            {t("home.services")}
           </a>
+
+          <LanguageToggle />
 
           <Link
             to="/admin/login"
             className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 rounded-lg border border-teal-600 text-teal-700 text-xs sm:text-sm font-semibold hover:bg-teal-50 transition whitespace-nowrap"
           >
             <LockKeyhole size={15} />
-            Admin Login
+            {t("home.adminLogin")}
           </Link>
 
         </div>
@@ -72,26 +77,25 @@ function Home() {
 
           <span className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 rounded-full px-4 py-2 text-sm">
             <ShieldCheck size={17} />
-            Trusted Home Healthcare
+            {t("home.trusted")}
           </span>
 
           <h1 className="text-4xl md:text-6xl font-bold mt-8 leading-tight">
-            Quality care at home,
+            {t("home.title")}
             <span className="text-teal-600">
-              {" "}made simple.
+              {" "}{t("home.titleAccent")}
             </span>
           </h1>
 
           <p className="text-gray-500 mt-6 text-lg">
-            Find the right care for your loved ones.
-            Build a personalized care plan and get an instant price estimate.
+            {t("home.subtitle")}
           </p>
 
           <Link
             to="/calculator"
             className="inline-flex items-center gap-3 mt-9 bg-teal-600 text-white px-7 py-4 rounded-xl font-semibold hover:bg-teal-700 transition"
           >
-            Build Your Care Plan
+            {t("home.buildPlan")}
             <ArrowRight size={19} />
           </Link>
 
@@ -100,12 +104,12 @@ function Home() {
 
             <span className="flex gap-2 items-center">
               <ShieldCheck className="text-teal-600" size={18} />
-              Trained Caregivers
+              {t("home.trained")}
             </span>
 
             <span className="flex gap-2 items-center">
               <Clock className="text-teal-600" size={18} />
-              Flexible Care Plans
+              {t("home.flexible")}
             </span>
 
           </div>
@@ -128,11 +132,11 @@ function Home() {
               />
 
               <h3 className="font-bold">
-                {title}
+                {t(title)}
               </h3>
 
               <p className="text-sm text-gray-500 mt-2">
-                {description}
+                {t(description)}
               </p>
             </div>
           ))}
@@ -146,8 +150,9 @@ function Home() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <LanguageProvider>
+      <AuthProvider>
+        <Routes>
 
         {/* Public Routes */}
         <Route
@@ -182,7 +187,8 @@ export default function App() {
           element={<Navigate to="/" replace />}
         />
 
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
